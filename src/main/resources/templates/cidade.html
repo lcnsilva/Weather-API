@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clima</title>
+</head>
+<body>
+    <main>
+        <h1>
+            Consulta de Cidade
+        </h1>
+        <label for="cidade">Digite o nome da cidade:</label>
+        <input id="cidade" type="text">
+        <button onclick="consultarCidade()">
+            Consultar
+        </button>
+        <div id="resultado"></div>
+    </main>
+
+    <!---js-->
+
+    <script>
+        function consultarCidade() {
+    var cityName = document.getElementById('cidade').value;
+    var url = 'http://localhost:8080/cidade/' + encodeURIComponent(cityName);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            var data = JSON.parse(xhr.responseText);
+            exibirResultado(data);
+        } else {
+            console.error('Erro ao consultar a cidade. Status: ' + xhr.status);
+        }
+    };
+
+    xhr.send();
+}
+
+function kelvinParaCelsius(temperature){
+	temperature = 273.15 - temperature;
+	return temperature;	
+} 
+
+function exibirResultado(data) {
+    var resultadoDiv = document.getElementById('resultado');
+    resultadoDiv.innerHTML = '';
+
+    var mainTempCelsius = kelvinParaCelsius(data.main.temp);
+    var minTempCelsius = kelvinParaCelsius(data.main.temp_min);
+    var maxTempCelsius = kelvinParaCelsius(data.main.temp_max);
+	var segundosParaHora = data.timezone / 3600;
+    var resultadoHTML = '<h2>Dados da Cidade</h2>';
+    resultadoHTML += '<p>Nome: ' + data.name + '</p>';
+    resultadoHTML += '<p>Temperatura: ' + mainTempCelsius.toFixed(2) + ' °C</p>';    
+    resultadoHTML+= '<p> Temperatura Mínima: ' + maxTempCelsius.toFixed(2) + ' °C</p>';
+    resultadoHTML+= '<p> Temperatura Mínima: ' + minTempCelsius.toFixed(2) + ' °C</p>';
+    resultadoHTML += '<p>Fuso Horário: ' + segundosParaHora.toFixed(2) + ' GMT</p>';
+    resultadoHTML += '<p>ID cidade: ' + data.id + '</p>';
+    resultadoHTML+= '<p> API Utilizada: openweathermap.org </p>';
+
+
+
+    resultadoDiv.innerHTML = resultadoHTML;
+}
+
+
+    </script>
+
+</body>
+</html>
